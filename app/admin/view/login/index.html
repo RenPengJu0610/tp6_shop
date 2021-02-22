@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <title>尤洪</title>
+    <!-- Meta tag Keywords -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <!-- //Meta tag Keywords -->
+    <!--/Style-CSS -->
+    <link rel="stylesheet" href="{__CSS__}/style.css" type="text/css" media="all" />
+    <!--//Style-CSS -->
+</head>
+
+<body>
+<!-- /login-section -->
+
+<section class="w3l-forms-23">
+    <div class="forms23-block-hny">
+        <div class="wrapper">
+            <h1>Login</h1>
+            <div class="d-grid forms23-grids">
+                <div class="form23">
+                    <div class="main-bg">
+                        <h6 class="sec-one">尤 洪</h6>
+                        <div class="speci-login first-look">
+                            <img src="{__IMG__}/user.png" alt="" class="img-responsive">
+                        </div>
+                    </div>
+                    <div class="bottom-content">
+                        <form action="#" method="post">
+                            <input type="text" name="username" class="input-form" id="username" value="zhangsan"  placeholder="请输入账号或密码"/>
+                            <input type="password" name="password" id="password" class="input-form" value="123456"
+                                   placeholder="请输入密码"/>
+                            <input type="text" name="captcha" class="input-form" id="captcha" placeholder="请输入验证码"/>
+                            <div>
+                                {:captcha_img('','',360,54)}
+                            </div>
+                            <button type="button" onclick="login()" class="loginhny-btn btn">登录</button>
+                        </form>
+                        <p>还没有账号? <a href="#">点击注册!</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="w3l-copy-right text-center">
+                <p>© 2020 尤洪后台用户登录</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //login-section -->
+</body>
+
+</html>
+<script src="{__JS__}/jquery-3.2.1.min.js"></script>
+<script>
+
+    function login(){
+        var username = $('#username').val();
+        var password = $('#password').val();
+        var captcha  = $('#captcha').val();
+        if (username == '' || password == '' || captcha == ''){
+            alert('账号、密码、验证码必填')
+        }
+       var url = '/admin/login/check';
+        $.ajax({
+            url:url,
+            data:{username:username,password:password,captcha:captcha},
+            type:'POST',
+            dataType:'json',
+            success:function (json){
+                if(json.status == 200){
+                    alert(json.message);
+                    window.location.href = "{:url('/admin/index/index')}";
+                }else{
+                    alert(json.message);
+                }
+            }
+        })
+    }
+</script>

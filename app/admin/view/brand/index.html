@@ -1,0 +1,86 @@
+{include file="public/head"/}
+{include file="public/left"/}
+<div style="padding: 15px;">
+    <div style="padding: 30px"> <h2>品牌添加</h2></div>
+    <form class="layui-form" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">品牌名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="brand_name" required   placeholder="请输入品牌名称" value="李宁" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">品牌Log</label>
+            <div CLASS="layui-input-inline">
+                <button type="button" class="layui-btn" id="test1">
+                    <i class="layui-icon">&#xe67c;</i>上传图片
+                </button>
+                <img src="" alt="" id="brand_img" style="display: none">
+                <input type="hidden" readonly name="brand_img" value="">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">品牌网址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="brand_url" required  placeholder="请输入品牌网址" value="http://www.lining.com" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux"></div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        //Demo
+        var form,$;
+        layui.use(['form','upload'], function(){
+            var form = layui.form;
+            $= layui.jquery;
+            var layer = layui.layer;
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+                $.ajax({
+                    url:"{:url('brand/create')}",
+                    data:data.field,
+                    type:'POST',
+                    dataType:'JSON',
+                    success:function (json_info){
+                        layer.msg(json_info.message)
+                    }
+                })
+                //layer.msg(JSON.stringify(data.field));
+                return false;
+            });
+            var upload = layui.upload;
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#test1' //绑定元素
+                ,url: "{:url('brand/uploadbrandimg')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    console.log(res)
+                    $('#brand_img').prop('src',res.data.path);
+                    $('#brand_img').show();
+                    $('[name=brand_img]').val(res.data.path)
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+    </script>
+
+</div>
+<style>
+    #brand_img{
+        width: 100px;
+        height: 100px;
+    }
+</style>
+{include file="public/bottom"/}
