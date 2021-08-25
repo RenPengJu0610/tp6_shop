@@ -35,7 +35,7 @@ class AuthBase extends ApiBase{
         $userInfo = Cache::get(config('redis.token_pre').$this->accessToken);
         if (!$userInfo){
             return false;
-        }
+          }
 
         if (!empty($userInfo['id']) && !empty($userInfo['username'])){
 

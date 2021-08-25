@@ -1,0 +1,243 @@
+{include file="public/head"/}
+{include file="public/left"/}
+<link rel="stylesheet" href="{__JS__}/layui-v2.5.4/css/layui.css" media="all">
+
+
+<!--注释下列css代码可恢复layui布局-->
+<!--
+    <link rel="stylesheet" href="{__CSS__}/public.css" media="all">
+-->
+    <style>
+        .inoutCls {
+            height: 22px;
+            line-height: 22px;
+            padding: 0 5px;
+            font-size: 12px;
+            background-color: #1E9FFF;
+            max-width: 80px;
+            border: none;
+            color: #fff;
+            margin-left: 10px;
+            display: inline-block;
+            white-space: nowrap;
+            text-align: center;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+    </style>
+
+<div class="layuimini-container" >
+    <div class="layuimini-main">
+
+        <button type="button" class="layui-btn add" style="margin: 20px">添 加</button>
+
+        <div class="layui-form" style="margin-top: 20px; margin: 20px">
+
+            <button type="button" class="layui-btn layui-btn-radius layui-btn-normal level" data-pid="{$pid}">上一级分类</button>
+
+            <table class="layui-table">
+                <colgroup>
+                    <col width="40">
+                    <col width="60">
+                    <col width="100">
+                    <col width="130">
+                    <col width="130">
+                    <col width="70">
+                    <col width="70">
+                    <col width="185">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>标题</th>
+                    <th>排序</th>
+                    <th class="text-center">创建时间</th>
+                    <th class="text-center">修改时间</th>
+                    <th class="text-center">操作人</th>
+                    <th class="text-center">状 态</th>
+                    <th>操作管理</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--一级类目循环-->
+                {volist name="category['data']" id= "vo"}
+                <tr>
+                    <td>
+                        {$vo.id}
+                    </td>
+                    <td>
+                        {$vo.cname}
+                    </td>
+                    <td>
+                        <div class="layui-input-inline">
+                            <input type="text" value="{$vo.listorder}" data-id="{$vo.id}" class="changeSort layui-input">
+                        </div>
+
+                    </td>
+                    <td>
+                        {$vo.ctime|date='Y-m-d H:i:s'}
+                    </td>
+                    <td>
+                        {$vo.utime|date="Y-m-d H:i:s"}
+                    </td>
+                    <td>
+                        张三
+                    </td>
+
+                    <td data-id="{$vo.id}"><input type="checkbox" {if $vo.status == 1} checked {else/} {/if} name="status" lay-skin="switch"
+                                           lay-filter="switchStatus"
+                                           lay-text="ON|OFF">
+                    </td>
+
+
+                    <td>
+                        <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete del-child" data-ptype="1"
+                           lay-event="delete" data-id="{$vo.id}">删除</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-normal" href="{:url('category/index',['pid'=> $vo.id])}">子栏目({$vo.childcount})</a>
+                    </td>
+                </tr>
+
+                {/volist}
+                <!--一级类目循环 end-->
+                </tbody>
+            </table>
+        </div>
+<!--
+        {$category.render |raw}
+-->
+        <div id="pages" style="margin: 20px"></div>
+    </div>
+
+</div>
+<style>
+    .pagination li{ display: inline;padding-left: 10px}
+    .pagination .active{color: red}
+</style>
+<script src="{__JS__}/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="{__JS__}/layui-v2.5.4/layui.js" charset="utf-8"></script>
+<script src="{__JS__}/common.js?v5" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'laypage'], function () {
+        var form = layui.form
+            , laypage = layui.laypage;
+
+        laypage.render({ //分页
+            elem: 'pages'
+            , count: {$category.total}
+            , theme: '#FFB800'
+            ,limit:{$category.per_page}
+            ,curr:{$category.current_page}
+            ,jump:function (obj,first){
+                if (!first){
+                    location.href="?page="+obj.curr + "&pid={$pid}";
+                }
+            }
+        });
+        //返回上一级
+
+        $('.level').on('click',function (){
+
+            let  id = $(this).attr('data-pid');
+
+            if (id == 0){
+                layer.msg('已到顶级分类');
+                return false;
+            }
+
+           // location.href="{:url('admin/category/index')}?pid="+id;
+
+
+        })
+
+        // 添加 分类
+        $('.add').on('click', function () {
+            layObj.dialog('addCateGory.html')
+        });
+
+        //监听状态 更改
+        form.on('switch(switchStatus)', function (obj) {
+
+            let id = obj.othis.parent().attr('data-id');
+            let status = obj.elem.checked ? 1 : 2;
+            $.ajax({
+                url: '{:url("category/status")}?id=' + id + '&status=' + status,
+                success: (res) => {
+                    if (res.status == 200){
+                        window.location.reload();
+                    }else{
+                        layer.msg(res.message);
+                    }
+                }
+            });
+            return false;
+        });
+
+
+        function editCls(that, id, type) { // 分类修改  type 是 1 顶级  2级  3级
+            let name = $(that).val();
+            if (!name && (type == 1 || type == 2)) {
+                return layObj.msg('分类名称不能为空')
+            }
+            if (!name && type == 3) { // 演示 应该放到修改回调中  进行处理
+                return $(that).parent().remove()
+            }
+            let   url = '{:url("admin/edit")}?id=' + id + '&name=' + name
+            layObj.get(url,  (res) =>{
+                if (name && res) {
+                    $(that).val(name)
+                }
+            })
+            $.ajax({
+                url: '{:url("admin/edit")}?id=' + id + '&name=' + name,
+                success(res) {
+                    if (name && res) {
+                        $(that).val(name)
+                    }
+                }
+            })
+        }
+
+        // 删除二级分类
+        $('.del-child').on('click', function () {
+            let ptype = $(this).attr('data-ptype'); // fu
+            let id = $(this).attr('data-id'); // fu
+
+            layObj.box(`是否删除此分类`, () => {
+                let   url = '{:url("category/status")}?id=' + id + '&status=3'
+                layObj.get(url,  (res) =>{
+                    if (res.status == 200){
+                        window.location.reload();
+                    }else {
+                        layer.msg(res.message);
+                    }
+                })
+
+            })
+        })
+
+        $('.changeSort').on('change',function () {
+            let id = $(this).attr('data-id');
+            let val = $(this).val();
+
+            if(!val){
+                return;
+            }
+            let url = '{:url("category/listorder")}?id=' + id + '&listorder='+val;
+            //let url = 'http:www.baidu.com';
+            layObj.get(url,function (res) {
+                if (res.status == 200){
+                    //layer.msg(res.message);
+                    window.location.reload();
+                }else {
+                    layer.msg(res.message);
+                }
+            })
+
+        })
+
+
+    })
+</script>
+
+{include file="public/bottom"/}

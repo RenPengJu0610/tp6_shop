@@ -18,7 +18,7 @@ class Login extends BaseController{
      * @date 2020/12/22/17:14
      * @author RenPengJu
      */
-    public function login(){
+    public function index(){
 
         if(!$this->request->isPost()){
 

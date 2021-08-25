@@ -72,11 +72,11 @@ class Brand extends AdminBase
 
         $file = request()->file('file');
 
-        $savename = \think\facade\Filesystem::putFile( 'upload_brand_img', $file);
+        $savename = \think\facade\Filesystem::putFile( 'brand_image', $file);
 
         if (!empty($savename)){
             $data = [
-              'path' => '/storage/'.str_replace('\\','/',$savename)
+              'path' => '/upload/'.str_replace('\\','/',$savename)
             ];
             return success($data);
         }else{

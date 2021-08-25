@@ -12,7 +12,7 @@ use think\Exception;
 use think\facade\Cache;
 use app\common\lib\Str;
 class User{
-    public $userObj = null;
+    public $Model = null;
 
     /**
      * 实例化用户模型
@@ -20,7 +20,7 @@ class User{
      */
     public function __construct()
     {
-        $this->userObj =  new UserModel();
+        $this->Model =  new UserModel();
     }
 
 
@@ -31,7 +31,7 @@ class User{
         if ( empty($redisCode) || $redisCode != $data['code']){
 //            throw new \think\Exception('该验证码不存在或已失效',-1001);
         }
-        $userInfo = $this->userObj->getUserByPhone($data['phone_number']);
+        $userInfo = $this->Model->getUserByPhone($data['phone_number']);
 
         if (empty($userInfo)){
 
@@ -44,8 +44,8 @@ class User{
             ];
 
             try {
-                $this->userObj->save($data);
-                $userId = $this->userObj->id;
+                $this->Model->save($data);
+                $userId = $this->Model->id;
             }catch (\Exception $e){
                 throw new \think\Exception('数据库异常');
             }
@@ -59,7 +59,7 @@ class User{
             ];
 
             try {
-                 $this->userObj->updateById($userId,$login_data);
+                 $this->Model->updateById($userId,$login_data);
             }catch (\Exception $e){
                 throw new \think\Exception($e->getMessage());
             }
@@ -90,7 +90,7 @@ class User{
      */
     public function getNormalUserById($id){
 
-        $user = $this->userObj->getUserById($id);
+        $user = $this->Model->getUserById($id);
 
         if (!$user || $user->status != config('status.mysql.table_normal')){
             return [];
@@ -100,7 +100,7 @@ class User{
 
     public function getNormalUserByUserName($username){
 
-        $userInfo = $this->userObj->getUserByUsername($username);
+        $userInfo = $this->Model->getUserByUsername($username);
         if (!$userInfo || $userInfo->status != config('status.mysql.table_normal')){
             return  [];
         }
@@ -120,7 +120,7 @@ class User{
             throw new Exception('该用户名已经存在');
         }
 
-        $result =  $this->userObj->updateById($id,$data);
+        $result =  $this->Model->updateById($id,$data);
 
         if (!$result){
             throw new Exception('未发生修改');
