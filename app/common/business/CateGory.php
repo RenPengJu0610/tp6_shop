@@ -30,7 +30,8 @@ class CateGory
      * @date 2021/5/14/9:34
      * @author RenPengJu
      */
-    public function add($data){
+    public function add($data)
+    {
 
         $data['status'] = config('status.mysql.table_normal');
         $data['ctime'] = time();
@@ -39,12 +40,12 @@ class CateGory
         $cname = $data['cname'];
 
         $cateGoryName = $this->Model->getCateGoryName($cname);
-        if (!empty($cateGoryName)){
+        if (!empty($cateGoryName)) {
             throw new Exception('分类名称已存在，请重新输入');
         }
         try {
             $this->Model->save($data);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new Exception('服务器内部异常');
         }
         return $this->Model->getLastInsID();
@@ -56,60 +57,63 @@ class CateGory
      * @date 2021/5/15/12:30
      * @author RenPengJu
      */
-    public function getNormalCateGorys(){
+    public function getNormalCateGorys()
+    {
 
         $field = "id,pid,cname";
 
         $cateGorys = $this->Model->getNormalCateGorys($field);
 
-        if (!$cateGorys){
+        if (!$cateGorys) {
             return $cateGorys = [];
         }
-        $cateGorys = $cateGorys -> toArray();
+        $cateGorys = $cateGorys->toArray();
 
         return $cateGorys;
     }
 
-    public function getNormalAllCateGorys(){
+    public function getNormalAllCateGorys()
+    {
 
         $field = "id as category_id,pid,cname as name,listorder";
 
         $cateGorys = $this->Model->getNormalCateGorys($field);
 
-        if (!$cateGorys){
+        if (!$cateGorys) {
             return $cateGorys = [];
         }
-        $cateGorys = $cateGorys -> toArray();
+        $cateGorys = $cateGorys->toArray();
 
         return $cateGorys;
     }
 
-    public function getCateGoryList($data,$num){
+    public function getCateGoryList($data, $num)
+    {
 
-        $list = $this->Model->getCateGoryList($data,$num);
+        $list = $this->Model->getCateGoryList($data, $num);
 
-        if (!$list){
+        if (!$list) {
             return \app\common\lib\Arr::getPaginateDefaultData($num);
         }
         $result = $list->toArray();
 
         $result['render'] = $list->render();
 
-        $pids = array_column($result['data'],'id');
+        $pids = array_column($result['data'], 'id');
 
-        if ($pids){
+        if ($pids) {
 
-            $idCountResult = $this->Model->getChildCountInPids(['pid'=>$pids]);
+            $idCountResult = $this->Model->getChildCountInPids(['pid' => $pids]);
 
             $idCountResult = $idCountResult->toArray();
             $idCount = [];
 
-            foreach ($idCountResult as $countResult){
-                $idCount[$countResult['pid']]   =   $countResult['count'];
+            foreach ($idCountResult as $countResult) {
+                $idCount[$countResult['pid']] = $countResult['count'];
             }
 
-            if ($result['data']){
-                foreach ($result['data'] as $k => $value){
+            if ($result['data']) {
+                foreach ($result['data'] as $k => $value) {
                     $result['data'][$k]['childcount'] = $idCount[$value['id']] ?? 0;
                 }
             }
@@ -119,29 +123,32 @@ class CateGory
 
     }
 
-    public function getById($id){
+    public function getById($id)
+    {
 
         $res = $this->Model->find($id);
 
-        if (!$res){
+        if (!$res) {
             return [];
         }
 
         return $res;
     }
-    public function listOrder($data){
+
+    public function listOrder($data)
+    {
 
         $res = $this->getById($data['id']);
 
-        if (!$res){
+        if (!$res) {
             throw new Exception('不存在该数据');
         }
 
         try {
-            $result = $this->Model->getByIdUpdate($data['id'],$data);
-        }catch (\Exception $e){
+            $result = $this->Model->getByIdUpdate($data['id'], $data);
+        } catch (\Exception $e) {
             //记录错误日志
-            Log::error('listOrder-'.$e->getMessage(),[],$e->getMessage());
+            Log::error('listOrder-' . $e->getMessage(), [], $e->getMessage());
 
             return false;
         }
@@ -150,22 +157,23 @@ class CateGory
 
     }
 
-    public function status($data){
+    public function status($data)
+    {
 
         $res = $this->getById($data['id']);
 
-        if (!$res){
-            return show(config('status.error'),'没有该记录');
+        if (!$res) {
+            return show(config('status.error'), '没有该记录');
         }
 
-        if ($res['status'] == $data['status']){
+        if ($res['status'] == $data['status']) {
             throw new Exception('未发生修改');
         }
 
         try {
-           $result = $this->Model->getByIdUpdate($data['id'],$data) ;
-        }catch (\Exception $e){
-            Log::error('getByIdUpdateStatus-'.$e->getMessage(),[],$e->getMessage());
+            $result = $this->Model->getByIdUpdate($data['id'], $data);
+        } catch (\Exception $e) {
+            Log::error('getByIdUpdateStatus-' . $e->getMessage(), [], $e->getMessage());
             return false;
         }
 
@@ -182,10 +190,11 @@ class CateGory
      * @date 2021/7/4/13:49
      * @author RenPengJu
      */
-    public function getNormalByPid($pid = 0,$field = "id,cname,pid"){
+    public function getNormalByPid($pid = 0, $field = "id,cname,pid")
+    {
         try {
-            $res = $this->Model->getNormalByPid($pid,$field);
-        }catch (\Exception $e){
+            $res = $this->Model->getNormalByPid($pid, $field);
+        } catch (\Exception $e) {
             return [];
         }
         $res = $res->toArray();
@@ -193,43 +202,44 @@ class CateGory
         return $res;
     }
 
-    public function getNormalDataByCategoryId($categoryId = 0){
+    public function getNormalDataByCategoryId($categoryId = 0)
+    {
 
         // 根据分类id 获取对应的数据
         try {
             $res = $this->Model->getNormalDataByCategoryId($categoryId);
-            if (!$res){
+            if (!$res) {
                 throw new Exception('没有相关数据');
             }
             $res = $res->toArray();
             $result = array();
             // 如果pid等于0说明是顶级分类
-            if (empty($res['pid'])){
+            if (empty($res['pid'])) {
                 $result['name'] = $res['name'];
                 // 根据顶级分类id查询该分类下是否存在二级分类子分类
                 $field = "id,cname as name";
-                $reclassData = $this->Model->getNormalByPid($res['id'],$field);
+                $reclassData = $this->Model->getNormalByPid($res['id'], $field);
                 $reclassData = $reclassData->toArray();
-                if (empty($reclassData)){
+                if (empty($reclassData)) {
                     $result['focus_ids'] = $res['id'];
                     $result['list'][] = [];
                 }
-                $result['focus_ids'] = [$res['id'],$reclassData[0]['id']];
+                $result['focus_ids'] = [$res['id'], $reclassData[0]['id']];
                 $result['list'][] = $reclassData;
-                $list = $this->Model->getNormalByPid($reclassData[0]['id'],$field);
+                $list = $this->Model->getNormalByPid($reclassData[0]['id'], $field);
                 $list = $list->toArray();
-                if (!empty($list)){
+                if (!empty($list)) {
                     $result['list'][] = $list;
-                }else{
+                } else {
                     $result['list'][] = [];
                 }
-            }else{
+            } else {
                 // pid不等于0说明是通过点击的二级分类进来的，需要根据Pid查询到父级数据
                 $result['name'] = $res['name'];
-                $result['focus_ids'] = [$res['pid'],$res['id']];
+                $result['focus_ids'] = [$res['pid'], $res['id']];
                 $result['list'] = $res;
             }
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return Show::fail($e->getMessage());
         }
         return $result;

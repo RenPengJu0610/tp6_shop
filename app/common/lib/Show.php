@@ -15,7 +15,17 @@ class Show{
             'result' => $data
         ],$httpStatus);
     }
-    public static function fail($msg,$status=100,$data = []){
+
+    /**
+     * 失败返回的数据
+     * @param string $msg
+     * @param int $status
+     * @param array $data
+     * @return \think\response\Json
+     * @date 2021/8/26/19:11
+     * @author RenPengJu
+     */
+    public static function fail($msg = 'error',$status=100,$data = []){
         $arr = [
             'status'=>$status,
             'message'=>$msg,

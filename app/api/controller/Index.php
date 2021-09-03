@@ -28,7 +28,6 @@ class Index extends BaseController
         $cateGoryIds = [
             1,
             2
-
         ];
         $result = (new GoodsBus())->cagegoryGoodsRecommend($cateGoryIds);
 

@@ -20,6 +20,7 @@ class Arr
         }
         $tree = [];
 
+
         foreach ($items as $id => $item) {
             if (isset($items[$item['pid']])) {
                 $items[$item['pid']]['list'][] = &$items[$id];
@@ -50,17 +51,29 @@ class Arr
                 'pid'=>51
             ]
         ];
-         *  联系无限极分类数据的组装
-         * foreach ($items as $id => $item){
+        foreach ($items as $id => $item){
             if (isset($items[$item['pid']])){
                 $items[$item['pid']]['list'][] = &$items[$id];
             }else{
                 $tree[] = &$items[$id];
             }
+            return  $tree;
+        }
         }*/
+
         return $tree;
     }
 
+    /**
+     * 按相应的规则截取无限极分类的树形结构数据
+     * @param $data 无限极分类的数据
+     * @param int $firstCount 要截取的长度
+     * @param int $secondCount 要截取的长度
+     * @param int $threeCount 要截取的长度
+     * @return array
+     * @date 2021/8/26/17:52
+     * @author RenPengJu
+     */
     public static function sliceTreeArr($data, $firstCount = 5, $secondCount = 3, $threeCount = 5)
     {
         $data = array_slice($data, 0, $firstCount);
@@ -74,6 +87,17 @@ class Arr
                 }
             }
         }
+        /*$data = array_slice($data,0,$firstCount);
+        foreach ($data as $k => $v){
+            if (!empty($v['list'])){
+                $data[$k]['list'] = array_slice($v['list'],0,$threeCount);
+                foreach ($v['list'] as $kk => $vv){
+                    if (!empty($vv['list'])){
+                        $data[$k]['list'][$kk]['list'] = array_slice($vv['list'],0,$secondCount);
+                    }
+                }
+            }
+        }*/
         return $data;
     }
 

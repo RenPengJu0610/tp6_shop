@@ -16,4 +16,17 @@ class GoodsSku extends Model
     protected $table = 'mall_goods_sku';
     protected $autoWriteTimestamp = true;
 
+    public function goods(){
+        return $this->hasOne('goods','id','goods_id');
+    }
+
+    public function getSkusByGoodsId($goods_id = 0){
+        $where = [
+           'goods_id' => $goods_id,
+           'status' => config('status.mysql.table_normal')
+        ];
+
+        return $this->where($where)->select();
+    }
+
 }

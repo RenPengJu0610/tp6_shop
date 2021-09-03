@@ -56,6 +56,15 @@ class Goods extends BaseModel
         return request()->domain().$value;
     }
 
+    public function getCarouselImageAttr($value){
+        if (!empty($value)){
+            $value = explode(',',$value);
+            $value = array_map(function ($v){
+                return request()->domain() . $v ;
+            },$value);
+        }
+        return $value;
+    }
     /*
      * 关于tp6 图片路径不显示的问题
      * public function host(bool $strict = false): string
@@ -68,6 +77,7 @@ class Goods extends BaseModel
 
         return true === $strict && strpos($host, ':') ? strstr($host, ':', true) : $host;
     }*/
+
     public function getNormalGoodsFindInSetCategoryId($field,$category_id,$limit = 10){
         $order = ['listorder' => 'desc','id' => 'desc'];
         return $this->whereFindInSet('category_path_id',$category_id)

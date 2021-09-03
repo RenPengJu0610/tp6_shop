@@ -23,4 +23,10 @@ class BaseModel extends Model
 
         return $this->where($where)->save($data);
     }
+
+    public function getNormalInIds($ids) {
+        return $this->whereIn("id", $ids)
+            ->where("status", "=", config("status.mysql.table_normal"))
+            ->select();
+    }
 }
